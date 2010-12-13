@@ -168,7 +168,7 @@ TEST(wat_array, random){
     uint64_t kth_pos = 0;
     uint64_t kth_val = 0;
     uint64_t k = rand() % (end_pos - begin_pos);
-    ws.RangeTopKQuery(begin_pos, end_pos, k, kth_pos, kth_val);
+    ws.RangeQuantileQuery(begin_pos, end_pos, k, kth_pos, kth_val);
     ASSERT_EQ(vals[k].first, kth_val);
     // vals[k].second != kth_pos. kth_pos is the smallest position whose values are kth_val
 
