@@ -81,12 +81,12 @@ uint64_t WatArray::Rank(uint64_t c, uint64_t pos) const{
     uint64_t en_zero   = ba.Rank(0, en);
     uint64_t boundary  = st + en_zero - st_zero;
     uint64_t bit       = GetMSB(c, i, bit_arrays_.size());
-    if (bit){
-      pos = boundary + ba.Rank(1, pos) - (st - st_zero);
-      st = boundary;
-    } else {
+    if (!bit){
       pos = st + ba.Rank(0, pos) - st_zero;
       en = boundary;
+    } else {
+      pos = boundary + ba.Rank(1, pos) - (st - st_zero);
+      st = boundary;
     }
   }
   return pos - st;
@@ -124,26 +124,135 @@ uint64_t WatArray::RankLessThan(uint64_t c, uint64_t pos) const{
     uint64_t en_zero   = ba.Rank(0, en);
     uint64_t boundary  = st + en_zero - st_zero;
     uint64_t bit       = GetMSB(c, i, bit_arrays_.size());
-    if (bit){
+    if (!bit){
+      pos = st + ba.Rank(0, pos) - st_zero;
+      en = boundary;
+    } else {
       rank += ba.Rank(0, pos) - st_zero;
       pos = boundary + ba.Rank(1, pos) - (st - st_zero);
       st = boundary;
-    } else {
-      pos = st + ba.Rank(0, pos) - st_zero;
-      en = boundary;
     }
   }
   return rank;
 }
 
 uint64_t WatArray::RankRange(uint64_t min_c, uint64_t max_c, uint64_t begin_pos, uint64_t end_pos) const{
-  if (max_c > alphabet_num_) return NOTFOUND;
-  if (end_pos > length_) return NOTFOUND;
+  if (min_c >= alphabet_num_) return 0;
+  if (max_c <= min_c) return 0;
+  if (end_pos > length_ || begin_pos > end_pos) return 0;
   return 
     + RankLessThan(end_pos,   max_c)
     - RankLessThan(end_pos,   min_c)
     - RankLessThan(begin_pos, max_c)
     + RankLessThan(begin_pos, min_c);
+}
+
+void WatArray::RangeMaxQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t& pos, uint64_t& val) const {
+  RangeQuery(begin_pos, end_pos, 0, MAX_QUERY, pos, val);
+} 
+
+void WatArray::RangeMinQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t& pos, uint64_t& val) const {
+  RangeQuery(begin_pos, end_pos, 0, MIN_QUERY, pos, val);
+}
+
+void WatArray::RangeTopKQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t k, uint64_t& pos, uint64_t& val) const {
+  RangeQuery(begin_pos, end_pos, k, KTH_QUERY, pos, val);
+}
+
+
+void WatArray::RangeQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t k, Strategy strategy, uint64_t& pos, uint64_t& val) const {
+  if (end_pos > length_ || begin_pos >= end_pos) {
+    pos = NOTFOUND;
+    val = NOTFOUND;
+    return;
+  }
+  
+  val = 0;
+  uint64_t st = 0;
+  uint64_t en = length_;
+  for (size_t i = 0; i < bit_arrays_.size(); ++i){
+    const BitArray& ba = bit_arrays_[i];
+    uint64_t st_zero   = ba.Rank(0, st);
+    uint64_t en_zero   = ba.Rank(0, en);
+    uint64_t st_one    = st - st_zero;
+    uint64_t beg_zero  = ba.Rank(0, begin_pos);
+    uint64_t end_zero  = ba.Rank(0, end_pos);
+    uint64_t beg_one   = begin_pos - beg_zero;
+    uint64_t end_one   = end_pos - end_zero;
+    uint64_t boundary  = st + en_zero - st_zero;
+    
+    if (ChooseLeftChild(end_zero - beg_zero, 
+			end_one  - beg_one,
+			k,
+			strategy)){
+      en        = boundary; 
+      begin_pos = st + beg_zero - st_zero;
+      end_pos   = st + end_zero - st_zero;
+      val       = val << 1;
+    } else {
+      st        = boundary; 
+      begin_pos = boundary + beg_one - st_one;
+      end_pos   = boundary + end_one - st_one;
+      val       = (val << 1) + 1;
+
+      k -= end_zero - beg_zero;
+    }
+  }
+
+  uint64_t rank = begin_pos - st;
+  pos = Select(val, rank+1);
+}
+
+bool WatArray::ChooseLeftChild(uint64_t zero_num, uint64_t one_num, uint64_t k, Strategy strategy) const{
+  if (strategy == MAX_QUERY){
+    if (one_num > 0) return false;
+    return true;
+  } else if (strategy == MIN_QUERY){
+    if (zero_num > 0) return true;
+    return false;
+  } else if (strategy == KTH_QUERY){
+    if (zero_num > k) return true; 
+    return false;
+  } else {
+    return true; // not support
+  }
+}
+
+void WatArray::ListRange(uint64_t begin_pos, uint64_t end_pos, uint64_t num, vector<ListResult>& res) const {
+  res.clear();
+  if (end_pos > length_) return;
+
+  ListRangeRec(0, length_, begin_pos, end_pos, num, 0, 0, res);
+}
+
+void WatArray::ListRangeRec(uint64_t st, uint64_t en, uint64_t begin_pos, uint64_t end_pos, uint64_t num, 
+			    uint64_t depth, uint64_t c, vector<ListResult>& res) const {
+  if (res.size() >= num) return;
+  if (depth >= alphabet_bit_num_){
+    ListResult lr;
+    lr.c = c;
+    lr.freq = end_pos - begin_pos;
+    res.push_back(lr);
+    return; 
+  };
+
+  const BitArray& ba = bit_arrays_[depth];
+  
+  uint64_t st_zero   = ba.Rank(0, st);
+  uint64_t en_zero   = ba.Rank(0, en);
+  uint64_t st_one    = st - st_zero;
+  uint64_t beg_zero  = ba.Rank(0, begin_pos);
+  uint64_t end_zero  = ba.Rank(0, end_pos);
+  uint64_t beg_one   = begin_pos - beg_zero;
+  uint64_t end_one   = end_pos - end_zero;
+  uint64_t boundary  = st + en_zero - st_zero;
+  if (end_zero - beg_zero > 0) { // zero
+    ListRangeRec(st, boundary, st + beg_zero - st_zero, st + end_zero - st_zero, num, depth+1, c << 1, res);
+  }
+
+  if (end_one - beg_one > 0){ // one
+    ListRangeRec(boundary, en, boundary + beg_one - st_one, boundary + end_one - st_one, num, depth+1, (c << 1) + 1, res);
+  } 
 }
 
 uint64_t WatArray::Freq(uint64_t c) const {

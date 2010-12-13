@@ -108,6 +108,52 @@ public:
   uint64_t RankRange(uint64_t min_c, uint64_t max_c, uint64_t begin_pos, uint64_t end_pos) const;
 
   /**
+   * Range Max Query
+   * @param begin_pos The beginning position
+   * @param end_pos The ending position
+   * @param pos The position where the largest value appeared in the subarray A[begin_pos .. end_pos)
+                If there are many items having the largest values, the smallest pos will be reporeted
+   * @param val The largest value appeared in the subarray A[begin_pos ... end_pos)
+   */
+  void RangeMaxQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t& pos, uint64_t& val) const; 
+
+  /**
+   * Range Min Query
+   * @param begin_pos The beginning position
+   * @param end_pos The ending position
+   * @param pos The position where the smallest value appeared in the subarray A[begin_pos .. end_pos)
+                If there are many items having the smalles values, the smallest pos will be reporeted
+   * @param val The smallest value appeared in the subarray A[begin_pos ... end_pos)
+   */
+  void RangeMinQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t& pos, uint64_t& val) const; 
+
+  /**
+   * Range Top-K Query, Return the K-th largest value in the subarray
+   * @param begin_pos The beginning position
+   * @param end_pos The ending position
+   * @param k The order (should be smaller than end_pos - begin_pos).
+   * @param pos The position where the k-th largest value appeared in the subarray A[begin_pos .. end_pos)
+                If there are many items having the k-th largest values, the smallest pos will be reporeted
+   * @param val The k-th largest value appeared in the subarray A[begin_pos ... end_pos)
+   */
+  void RangeTopKQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t k, uint64_t& pos, uint64_t& val) const; 
+
+  struct ListResult{
+    uint64_t c;
+    uint64_t freq;
+  };
+
+  /**
+   * List the distinct characters appeared in A[begin_pos ... end_pos)
+   * @param begin_pos The beginning position of the array (inclusive)
+   * @param end_pos The ending positin of the array (not inclusive)
+   * @param num The maximum number of reporting results.
+   * @param res The distinct chracters in the A[begin_pos ... end_pos) from smallest ones. 
+   *            Each item consists of c:character and freq: frequency of c. 
+   */
+  void ListRange(uint64_t begin_pos, uint64_t end_pos, uint64_t num, std::vector<ListResult>& res) const;
+
+  /**
    * Compute the frequency of the character c
    * @param c The character to be examined
    * param Return the frequency of c in the array.
@@ -149,6 +195,23 @@ private:
   void GetBegPoses(const std::vector<uint64_t>& array, 
 		   uint64_t alpha_bit_num,
 		   std::vector<std::vector<uint64_t> >& beg_poses) const;
+
+  enum Strategy {
+    MAX_QUERY = 0,
+    MIN_QUERY = 1,
+    KTH_QUERY = 2
+  };
+
+  void RangeQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t k,
+		  Strategy strategy, uint64_t& pos, uint64_t& val) const;
+
+
+  bool ChooseLeftChild(uint64_t zero_num, uint64_t one_num, uint64_t k, Strategy strategy) const;
+
+  void ListRangeRec(uint64_t st, uint64_t en,
+		    uint64_t begin_pos, uint64_t end_pos, uint64_t num, 
+		    uint64_t depth, uint64_t c, std::vector<ListResult>& res) const;
+
 
   std::vector<BitArray> bit_arrays_;
   BitArray occs_;
