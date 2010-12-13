@@ -17,6 +17,7 @@
  *      software without specific prior written permission.
  */
 
+#include <queue>
 #include "wat_array.hpp"
 
 using namespace std;
@@ -155,7 +156,7 @@ void WatArray::RangeMinQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t& pos
   RangeQuery(begin_pos, end_pos, 0, MIN_QUERY, pos, val);
 }
 
-void WatArray::RangeTopKQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t k, uint64_t& pos, uint64_t& val) const {
+void WatArray::RangeQuantileQuery(uint64_t begin_pos, uint64_t end_pos, uint64_t k, uint64_t& pos, uint64_t& val) const {
   RangeQuery(begin_pos, end_pos, k, KTH_QUERY, pos, val);
 }
 
@@ -218,40 +219,108 @@ bool WatArray::ChooseLeftChild(uint64_t zero_num, uint64_t one_num, uint64_t k, 
   }
 }
 
-void WatArray::ListRange(uint64_t begin_pos, uint64_t end_pos, uint64_t num, vector<ListResult>& res) const {
-  res.clear();
-  if (end_pos > length_) return;
+class WatArray::TopKComparator{
+public:
+  TopKComparator() {}
+  bool operator() (const QueryOnNode& lhs, 
+		   const QueryOnNode& rhs) const {
+    if (lhs.end_pos - lhs.begin_pos != rhs.end_pos - rhs.begin_pos) 
+      return lhs.end_pos - lhs.begin_pos > rhs.end_pos - rhs.begin_pos;
+    else return lhs.depth > rhs.depth;
+  }
+};
 
-  ListRangeRec(0, length_, begin_pos, end_pos, num, 0, 0, res);
+class WatArray::DFSComparator{
+public:
+  DFSComparator() {}
+  bool operator() (const QueryOnNode& lhs, 
+		   const QueryOnNode& rhs) const {
+    if (lhs.depth != rhs.depth) 
+      return lhs.depth > rhs.depth;
+    else return lhs.begin_node > rhs.begin_node;
+  }
+};
+
+
+void WatArray::ListTopKRange(uint64_t begin_pos, uint64_t end_pos, uint64_t num, vector<ListResult>& res) const {
+  res.clear();
+  if (end_pos > length_ || begin_pos >= end_pos) return;
+
+  priority_queue<QueryOnNode, vector<QueryOnNode>, TopKComparator> qons;
+  qons.push(QueryOnNode(0, length_, begin_pos, end_pos, 0, 0));
+
+  while (!qons.empty()){
+    QueryOnNode qon = qons.top();
+    qons.pop();
+    if (res.size() >= num) return;
+    if (qon.depth >= alphabet_bit_num_){
+      ListResult lr;
+      lr.c = qon.prefix_c;
+      lr.freq = qon.end_node - qon.begin_node;
+      res.push_back(lr);
+      return; 
+    } else {
+      vector<QueryOnNode> next;
+      ExpandNode(qon, next);
+      for (size_t i = 0; i < next.size(); ++i){
+	qons.push(next[i]);
+      }
+    }    
+  }
 }
 
-void WatArray::ListRangeRec(uint64_t st, uint64_t en, uint64_t begin_pos, uint64_t end_pos, uint64_t num, 
-			    uint64_t depth, uint64_t c, vector<ListResult>& res) const {
-  if (res.size() >= num) return;
-  if (depth >= alphabet_bit_num_){
-    ListResult lr;
-    lr.c = c;
-    lr.freq = end_pos - begin_pos;
-    res.push_back(lr);
-    return; 
-  };
+void WatArray::ListRange(uint64_t begin_pos, uint64_t end_pos, uint64_t num, vector<ListResult>& res) const {
+  res.clear();
+  if (end_pos > length_ || begin_pos >= end_pos) return;
 
-  const BitArray& ba = bit_arrays_[depth];
-  
-  uint64_t st_zero   = ba.Rank(0, st);
-  uint64_t en_zero   = ba.Rank(0, en);
-  uint64_t st_one    = st - st_zero;
-  uint64_t beg_zero  = ba.Rank(0, begin_pos);
-  uint64_t end_zero  = ba.Rank(0, end_pos);
-  uint64_t beg_one   = begin_pos - beg_zero;
-  uint64_t end_one   = end_pos - end_zero;
-  uint64_t boundary  = st + en_zero - st_zero;
-  if (end_zero - beg_zero > 0) { // zero
-    ListRangeRec(st, boundary, st + beg_zero - st_zero, st + end_zero - st_zero, num, depth+1, c << 1, res);
+  priority_queue<QueryOnNode, vector<QueryOnNode>, DFSComparator> qons;
+  qons.push(QueryOnNode(0, length_, begin_pos, end_pos, 0, 0));
+
+  while (res.size() < num && !qons.empty()){
+    QueryOnNode qon = qons.top();
+    qons.pop();
+
+    if (qon.depth >= alphabet_bit_num_){
+      ListResult lr;
+      lr.c = qon.prefix_c;
+      lr.freq = qon.end_node - qon.begin_node;
+      res.push_back(lr);
+    } else {
+      vector<QueryOnNode> next;
+      ExpandNode(qon, next);
+      for (size_t i = 0; i < next.size(); ++i){
+	qons.push(next[i]);
+      }
+    }
   }
+}
 
+void WatArray::ExpandNode(const QueryOnNode& qon, vector<QueryOnNode>& next) const{
+  const BitArray& ba = bit_arrays_[qon.depth];
+  
+  uint64_t st_zero   = ba.Rank(0, qon.begin_node);
+  uint64_t en_zero   = ba.Rank(0, qon.end_node);
+  uint64_t st_one    = qon.begin_node - st_zero;
+  uint64_t beg_zero  = ba.Rank(0, qon.begin_pos);
+  uint64_t end_zero  = ba.Rank(0, qon.end_pos);
+  uint64_t beg_one   = qon.begin_pos - beg_zero;
+  uint64_t end_one   = qon.end_pos - end_zero;
+  uint64_t boundary  = qon.begin_node + en_zero - st_zero;
+  if (end_zero - beg_zero > 0) { // zero
+    next.push_back(QueryOnNode(qon.begin_node, 
+			       boundary, 
+			       qon.begin_node + beg_zero - st_zero, 
+			       qon.begin_node + end_zero - st_zero, 
+			       qon.depth+1,
+			       qon.prefix_c << 1));
+  }
   if (end_one - beg_one > 0){ // one
-    ListRangeRec(boundary, en, boundary + beg_one - st_one, boundary + end_one - st_one, num, depth+1, (c << 1) + 1, res);
+    next.push_back(QueryOnNode(boundary, 
+			       qon.end_node, 
+			       boundary + beg_one - st_one, 
+			       boundary + end_one - st_one, 
+			       qon.depth+1,
+			       (qon.prefix_c << 1) + 1));
   } 
 }
 
