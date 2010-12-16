@@ -7,3 +7,7 @@ def build(bld):
       source       = 'bit_array_test.cpp',
       target       = 'bit_array_test',
       uselib_local = 'wat_array')
+  bld(features     = 'cxx cprogram',
+      source       = 'performance_test.cpp',
+      target       = 'performance_test',
+      uselib_local = 'wat_array')
