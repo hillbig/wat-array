@@ -1,6 +1,11 @@
-#summary One-sentence summary of this page.
+* wat-array Performance Test for Artificial Data
+
+Result is taken from the program /test/performance_test
+
 
 Time for Construction 
+
+time per input bit = total_time / (length x log (alpha_num) )
 
 ||length||alpha_num||total_time (sec)|| time per input bit (nano sec) ||
 ||100000||10||0.004 ||12.6 ||
@@ -12,11 +17,11 @@ Time for Construction
 ||10000000||10000||1.897 ||14.2||
 ||100000000||10000||19.680 ||14.8 ||
 
-time per input bit = total_time / (length x log (alpha_num) )
-
 Time for 1,000,000 random queries (sec.)
 
-||length||alpha_num||lookup||rank||select||max_range||quan_range||freq_range||list_max_one||list_max_ten||list_mode_one||list_mode_ten||
+Input data is generated randomly, and queries are randomly generated. For range queries, we sample two distinct randoms, 0 <= a < b < max.
+
+||length||alpha_num||lookup||rank||select||max_range||quan_range||freq_range||list_max num=1||list_max num=10||list_mode num=1||list_mode num=10||
 ||100000||10||0.399 ||0.461 ||1.176 ||1.483 ||1.470 ||1.193 ||1.356 ||2.375 ||2.243 ||2.520 ||
 ||1000000||10||0.854 ||0.899 ||2.049 ||2.637 ||2.735 ||2.735 ||2.454 ||6.187 ||15.331 ||16.529 ||
 ||10000000||10||1.221 ||1.273 ||2.874 ||3.809 ||3.746 ||4.549 ||3.581 ||7.846 ||123.878 ||136.085 ||
