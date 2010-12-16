@@ -248,15 +248,18 @@ public:
 
 
  
-void WatArray::ListModeRange(uint64_t min_c, uint64_t max_c, uint64_t beg_pos, uint64_t end_pos, uint64_t num, vector<ListResult>& res) const {
+void WatArray::ListModeRange(uint64_t min_c, uint64_t max_c, uint64_t beg_pos, uint64_t end_pos,
+			     uint64_t num, vector<ListResult>& res) const {
   ListRange<ListModeComparator>(min_c, max_c, beg_pos, end_pos, num, res);
 }
 
-void WatArray::ListMinRange(uint64_t min_c, uint64_t max_c, uint64_t beg_pos, uint64_t end_pos, uint64_t num, vector<ListResult>& res) const {
+void WatArray::ListMinRange(uint64_t min_c, uint64_t max_c, uint64_t beg_pos, uint64_t end_pos,
+			    uint64_t num, vector<ListResult>& res) const {
   ListRange<ListMinComparator>(min_c, max_c, beg_pos, end_pos, num, res);
  }
 
-void WatArray::ListMaxRange(uint64_t min_c, uint64_t max_c, uint64_t beg_pos, uint64_t end_pos, uint64_t num, vector<ListResult>& res) const {
+void WatArray::ListMaxRange(uint64_t min_c, uint64_t max_c, uint64_t beg_pos, uint64_t end_pos,
+			    uint64_t num, vector<ListResult>& res) const {
   ListRange<ListMaxComparator>(min_c, max_c, beg_pos, end_pos, num, res);
 }
 
