@@ -12,7 +12,7 @@ For example, `n=10^8` and `k=10^3`, the working space of wat-array is `10^8 * lo
 
 = QuickStart = 
 
-Currently, wat-array is supported in Linux Ubuntu
+Currently, wat-array is supported in Ubuntu Linux 
 
 Download the latest tarball of wat-array from [http://code.google.com/p/wat-array/downloads/list Downloads].
 
