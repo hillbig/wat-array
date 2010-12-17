@@ -172,6 +172,8 @@ wat-arrayとbaselineの性能を人工データの元で比較した。baseline�
   * AND検索、ゲノム配列におけるPaired-End (PE) マッピング
 
 == 謝辞 ==
+wat-arrayはプリファードインフラストラクチャーの20%プロジェクトで作られました．
+
 wat-arrayは多くの研究成果を参考にして作られています。
   * Francisco Claude and Gonzalo Navarro. "Practical Rank/Select Queries over Arbitrary Sequences", Proc. SPIRE'08
   Wavelet Treeでアルファベット数分ビット配列を持たずに、つなげて保持する方法について
@@ -179,8 +181,7 @@ wat-arrayは多くの研究成果を参考にして作られています。
   wat-array/tool中のdoc_searchについて
   * Shane Culpepper, Gonzalo Navarro, Simon Puglisi, and Andrew Turpin. "Top-k Ranked Document Search in General Text Databases"
 Proc. ESA'10 
-   List系の操作、特にListModeRange
-  * R.Grossi, A. Gupta, and J. Vitter "High-order entropy-compressed text indexes", 
-   Proc. SODA 03
-   Wavelet Treeの元論文
-  * wat-arrayはプリファードインフラストラクチャーの20%プロジェクトで作られました．
+  List系の操作、特にListModeRange
+  * R.Grossi, A. Gupta, and J. Vitter "High-order entropy-compressed text indexes", Proc. SODA 03
+  Wavelet Treeの元論文
+ 
