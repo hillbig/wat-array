@@ -39,13 +39,13 @@ A.push_back(3);
 wat_array::WatArray wa;
 wa.Init(A);
 
-wa.Lookup(3); // 4. Return A[3]
+wa.Lookup(3); // =4. Return A[3]
 
-wa.Rank(2, 6); // 2. The num. of 2 in A[0...6)
+wa.Rank(2, 6); // =2. The num. of 2 in A[0...6)
 
-wa.Select(2, 2); // 5. The second 2 appeared in A[5]
+wa.Select(2, 2); // =5. The second 2 appeared in A[5]
 
-wa.RankLessThan(4, 5); // 3. 1,0,2 appear in A[0...5)
+wa.RankLessThan(4, 5); // =3. 1,0,2 appear in A[0...5)
 
 wa.RankMoreThan(4, 5); // =4. 5, 4 appear in A[0...5)
 
