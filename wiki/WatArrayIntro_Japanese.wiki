@@ -43,7 +43,7 @@ wat-array/tool/には、様々なサンプルプログラムがありますの�
 wat-arrayがサポートしている操作について以下にまとめます。APIの正確な詳細については [http://code.google.com/p/wat-array/source/browse/trunk/src/wat_array.hpp wat_array.hpp]を参照してください。
 
 || *Method* || ** ||
-|| `Init(A)` || 入力配列から `A`を構築する ||
+|| `Init(A)` || 入力配列 `A`に対するwat-arrayを構築する ||
 || `length` || `A`の長さを返す ||
 || `alphabet_num` || `A`中のアルファベット数 (A中の最大値+1) を返す ||
 || `Freq(c)` || `A`中の文字`c`の出現回数を返す||
