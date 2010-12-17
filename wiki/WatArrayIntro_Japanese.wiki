@@ -12,7 +12,7 @@ wat-arrayのもう一つの特徴が、作業領域量が小さいことです�
 
 = クイックスタート = 
 
-wat-arrayは現在Linux Ubuntuでの動作をサポートしています。多くのLinuxで動作することを想定しています。
+wat-arrayは現在Ubuntu Linuxでの動作をサポートしています。多くのLinuxで動作することを想定しています。
 
 はじめに、最新のtarball を[http://code.google.com/p/wat-array/downloads/list Downloads]からダウンロードしてください。
 
