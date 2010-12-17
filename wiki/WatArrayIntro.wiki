@@ -138,3 +138,13 @@ The table shows the average time per one query in micro sec (`10^{-6}` sec.). We
 ||
 
 The results show that wat-array is very efficient even for large alphabet, and almost constant for the lenght of the array. 
+
+== Acknowledgement ==
+wat-array is developed at the 20% project at Preferred Infrastructure Inc. 
+
+wat-array uses the following works
+  * Francisco Claude and Gonzalo Navarro. "Practical Rank/Select Queries over Arbitrary Sequences", Proc. SPIRE'08
+  * Travis Gagie, Gonzalo Navarro, and Simon Puglisi, "Colored Range Queries and Document Retrieval", Proc. SPIRE'10
+  * Shane Culpepper, Gonzalo Navarro, Simon Puglisi, and Andrew Turpin. "Top-k Ranked Document Search in General Text Databases"
+Proc. ESA'10 
+  * R.Grossi, A. Gupta, and J. Vitter "High-order entropy-compressed text indexes", Proc. SODA 03
