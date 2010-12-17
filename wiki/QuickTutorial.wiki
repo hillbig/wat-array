@@ -1,0 +1,60 @@
+see the definition in wat_array.hpp
+
+= API = 
+|| *Method* || *Detail* ||
+|| `Init(A)` || Create wat-array from the array`A` ||
+|| `Lookup(pos) `||  Return `A[pos]` ||
+|| `Rank(c, pos)` ||  Return the number of `c` in `A[0...pos)` ||
+|| `Select(c, rank)` || Return the position of the (rank)-th occurence of `c` in `A` ||
+|| `RankLessThan(c, pos)` || Return the number of `c'<c` in `A[0...pos)` ||
+|| `RankMoreThan(c, pos)` || Return the number of `c'>c` in `A[0...pos)` ||
+|| `FreqRange(min_c, max_c, beg_pos, end_pos)` || Return the number of `min_c<=c'<max_c` in `A[beg_pos...end_pos)` ||
+|| `MaxRange(beg_pos, end_pos)` || Return the maximum value and its position in `A[beg_pos...end_pos)` ||
+|| `MinRange(beg_pos, end_pos)` ||  Return the minimum value and its position in `A[beg_pos...end_pos)`. ||
+|| `QuantileRange(beg_pos, end_pos, k)` || Return the (k+1)-th smallest value and its position in `A[beg_pos...end_pos]`. ||
+|| `ListModeRange(min_c, max_c, beg_pos, end_pos, num)` || Return the most frequent characters and its frequencies in `A[beg_pos...end_pos)` and `min_c<=c<max_c`||
+|| `ListMinRange(min_c, max_c, beg_pos, end_pos, num)` || Return the characters in ascending order and its frequencies in `A[beg_pos...end_pos)` and `min_c<=c<max_c` ||
+|| `ListMaxRange(min_c, max_c, beg_pos, end_pos, num)` || Return the characters in descending order and its frequencies in `A[beg_pos...end_pos)` and `min_c<=c<max_c` ||
+|| `Save(os)` || Save the current status to os || 
+|| `Load(is)` || Load the status from is ||
+
+For MaxRange, MinRange, and QuantileRange, if there are many such positions, return the left most position.
+
+= Example =
+
+{{{
+vector<uint64_t> A;
+A.push_back(5);
+A.push_back(1);
+A.push_back(0);
+A.push_back(4);
+A.push_back(2);
+A.push_back(2);
+A.push_back(0);
+A.push_back(3);
+
+// index    01234567 
+// A       = 51042203
+
+wat_array::WatArray wa;
+wa.Init(A);
+
+wa.Lookup(3); // 4. Return A[3]
+
+wa.Rank(2, 6); // 2. The num. of 2 in A[0...6)
+
+wa.Select(2, 2); // 5. The second 2 appeared in A[5]
+
+wa.RankLessThan(4, 5); // 3. 1,0,2 appear in A[0...5)
+
+wa.RankMoreThan(4, 5); // =4. 5, 4 appear in A[0...5)
+
+wa.FreqRange(2, 5, 2, 6); // =3. 4, 2, 2, appear in A[2...5)
+
+wa.MaxRange(1, 6); // =(pos=3, val=4). A[3]=4 is the maximum in A[1...6)
+
+wa.QuantileRange(1, 6, 3); // = (pos=4, val=2). Sort A[1...6) = 001224, and its (k+1)-th value
+
+wa.ListModeRange(1, 5, 1, 6, 3); // = (val=0, freq=2), (val=2, freq=2), (val=1, freq=1)
+
+wa.ListMaxRange(1, 5, 1, 6, 3); // = (val=4, freq=1), (val=2, freq=2), (val=1, freq=1)
