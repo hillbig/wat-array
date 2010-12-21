@@ -78,6 +78,53 @@ TEST(wat_array, trivial){
   ASSERT_EQ(wat_array::NOTFOUND, ws_load.Lookup(0));
 }
 
+TEST(wat_array, alphanum_one){
+  vector<uint64_t> A;
+  A.push_back(0);
+  A.push_back(0);
+  A.push_back(0);
+  A.push_back(0);
+  A.push_back(0);
+
+  wat_array::WatArray wa;
+  wa.Init(A);
+  ASSERT_EQ(5, wa.length());
+  ASSERT_EQ(1, wa.alphabet_num());
+  ASSERT_EQ(0, wa.Rank(0, 0));
+  ASSERT_EQ(1, wa.Rank(0, 1));
+  ASSERT_EQ(2, wa.Rank(0, 2));
+  ASSERT_EQ(3, wa.Rank(0, 3));
+  ASSERT_EQ(4, wa.Rank(0, 4));
+  ASSERT_EQ(5, wa.Rank(0, 5));
+}
+
+TEST(wat_array, save){
+  vector<uint64_t> A;
+  A.push_back(1);
+  A.push_back(1);
+  A.push_back(1);
+  A.push_back(1);
+  A.push_back(3);
+  A.push_back(0);
+  A.push_back(1);
+  A.push_back(1);
+  A.push_back(1);
+  A.push_back(1);
+  A.push_back(3);
+  A.push_back(1);
+  A.push_back(2);
+  A.push_back(2);
+  wat_array::WatArray wa;
+  wa.Init(A);
+  ASSERT_EQ(2, wa.Rank(3, 14));
+  ostringstream os;
+  wa.Save(os);
+  istringstream is(os.str());
+  wat_array::WatArray wa_load;
+  wa_load.Load(is);
+  ASSERT_EQ(2, wa_load.Rank(3, 14));
+}
+  
 TEST(wat_array, small){
   wat_array::WatArray ws;
   vector<uint64_t> array;
@@ -311,9 +358,6 @@ TEST(wat_array, list_mode_range){
     RandomQuery rq(ws.length());
     RandomQuery arq(ws.alphabet_num());
     
-    cout << endl;
-    cout << rq.beg << " " << rq.end << " " << arq.beg << " " << arq.end << endl;
-    
     vector<pair<uint64_t, size_t> > vals;
     SetVals(rq, array, vals);
 
@@ -326,11 +370,6 @@ TEST(wat_array, list_mode_range){
     uint64_t num = rq.end - rq.beg;
     ws.ListModeRange(arq.beg, arq.end, rq.beg, rq.end, num, lrs);
     sort(lrs.begin(), lrs.end(), FreqCompLR());
-
-    for (size_t i = 0; i < lrs.size() && i < uniq_counts.size(); ++i){
-      cout << lrs[i].c << " " << lrs[i].freq << "\t"
-	   << uniq_counts[i].first << " " << uniq_counts[i].second << endl;
-    }
 
     for (size_t i = 0; i < lrs.size() && i < uniq_counts.size(); ++i){
       ASSERT_EQ(uniq_counts[i].first, lrs[i].c);
@@ -377,7 +416,6 @@ TEST(wat_array, list_max_range){
     vector<pair<uint64_t, uint64_t> > uniq_counts;
     UniqCount(vals, uniq_counts);
     FilterRange(arq, uniq_counts);
-    cout << arq.beg << " " << arq.end << endl;
 
     vector<wat_array::ListResult> lrs;
     uint64_t num = rq.end - rq.beg;
