@@ -147,3 +147,5 @@ wat-array uses the following works
   * Travis Gagie, Gonzalo Navarro, and Simon Puglisi, "Colored Range Queries and Document Retrieval", Proc. SPIRE'10
   * Shane Culpepper, Gonzalo Navarro, Simon Puglisi, and Andrew Turpin. "Top-k Ranked Document Search in General Text Databases", Proc. ESA'10 
   * R.Grossi, A. Gupta, and J. Vitter "High-order entropy-compressed text indexes", Proc. SODA 03
+
+Thanks Mr. Tabei for finding the bug about Log2().
