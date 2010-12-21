@@ -42,7 +42,7 @@ void WatArray::Clear(){
 void WatArray::Init(const vector<uint64_t>& array){
   Clear();
   alphabet_num_     = GetAlphabetNum(array);
-  alphabet_bit_num_ = Log2(alphabet_num_-1);
+  alphabet_bit_num_ = Log2(alphabet_num_);
   length_           = static_cast<uint64_t>(array.size());
   SetArray(array);
   SetOccs(array);
@@ -334,6 +334,9 @@ uint64_t WatArray::GetAlphabetNum(const std::vector<uint64_t>& array) const {
 }
 
 uint64_t WatArray::Log2(uint64_t x) const{
+  if (x == 0) return 0;
+  if (x == 1) return 1;
+  x--;
   uint64_t bit_num = 0;
   while (x >> bit_num){
     ++bit_num;
