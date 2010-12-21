@@ -188,4 +188,5 @@ Proc. ESA'10
   List系の操作、特にListModeRange
   * R.Grossi, A. Gupta, and J. Vitter "High-order entropy-compressed text indexes", Proc. SODA 03
   Wavelet Treeの元論文
+  * tabeiさんにはLog2()の問題を指摘していただきました。ありがとうございます。
  
