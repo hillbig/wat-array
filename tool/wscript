@@ -9,3 +9,8 @@ def build(bld):
       target       = 'wat_array',
       includes     = '.',
       uselib_local = 'wat_array')
+  bld(features     ='cxx cprogram',
+      source       = 'performance_test.cpp',
+      target       = 'performance_test',
+      includes     = '.',
+      uselib_local = 'wat_array')

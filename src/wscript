@@ -1,10 +1,10 @@
 def build(bld):
-  bld(features     ='cxx cshlib',
+  bld(features     = 'cxx cshlib',
       source       = 'wat_array.cpp bit_array.cpp',
       name         = 'wat_array',
       target       = 'wat_array',
       includes     = '.')
-  bld(features     ='cxx cstaticlib',
+  bld(features     = 'cxx cstaticlib',
       source       = 'wat_array.cpp bit_array.cpp',
       name         = 'wat_array',
       target       = 'wat_array',

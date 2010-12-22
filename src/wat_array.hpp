@@ -67,6 +67,8 @@ public:
    */
   void Init(const std::vector<uint64_t>& array);
 
+  void Init(const BitArray& ba, uint64_t width, uint64_t length);
+
   /**
    * Clear and release the resouces
    */

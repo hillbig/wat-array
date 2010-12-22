@@ -311,8 +311,8 @@ uint64_t WatArray::Freq(uint64_t c) const {
 }
 
 uint64_t WatArray::FreqSum(uint64_t min_c, uint64_t max_c) const {
-  if (max_c > alphabet_num_ || min_c >= max_c ) return NOTFOUND;
-  return occs_.Select(1, max_c+1) - occs_.Select(1, min_c+1) - (max_c - min_c);  
+  if (max_c > alphabet_num_ || min_c > max_c ) return NOTFOUND;
+    return occs_.Select(1, max_c+1) - occs_.Select(1, min_c+1) - (max_c - min_c);  
 }
 
 uint64_t WatArray::alphabet_num() const{

@@ -86,10 +86,14 @@ TEST(wat_array, alphanum_one){
   A.push_back(0);
   A.push_back(0);
 
+
+
   wat_array::WatArray wa;
   wa.Init(A);
   ASSERT_EQ(5, wa.length());
   ASSERT_EQ(1, wa.alphabet_num());
+  ASSERT_EQ(5, wa.Freq(0));
+  ASSERT_EQ(5, wa.FreqSum(0, 1));
   for (uint64_t i = 0; i < wa.length(); ++i){
     ASSERT_EQ(i, wa.Rank(0, i));
     ASSERT_EQ(0, wa.RankLessThan(0, i));
@@ -166,6 +170,9 @@ TEST(wat_array, small){
 
   for (uint64_t i = 0; i < alphabet_num; ++i){
     ASSERT_EQ(1, wa.Freq(i));
+    for (uint64_t j = i; j < alphabet_num; ++j){
+      ASSERT_EQ(j-i, wa.FreqSum(i, j));
+    }
   }
 
   vector<uint64_t> counts(alphabet_num);
