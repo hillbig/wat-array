@@ -38,32 +38,32 @@ struct RandomQuery{
 };
 
 TEST(wat_array, trivial){
-  wat_array::WatArray ws;
-  ASSERT_EQ(0, ws.alphabet_num());
-  ASSERT_EQ(0, ws.length());
-  ASSERT_EQ(0, ws.Rank(0, 0));
-  ASSERT_EQ(wat_array::NOTFOUND, ws.Select(0, 0));
-  ASSERT_EQ(wat_array::NOTFOUND, ws.Lookup(0));
-  ASSERT_EQ(wat_array::NOTFOUND, ws.Freq(0));
-  ASSERT_EQ(wat_array::NOTFOUND, ws.FreqSum(0, 1));
+  wat_array::WatArray wa;
+  ASSERT_EQ(0, wa.alphabet_num());
+  ASSERT_EQ(0, wa.length());
+  ASSERT_EQ(0, wa.Rank(0, 0));
+  ASSERT_EQ(wat_array::NOTFOUND, wa.Select(0, 0));
+  ASSERT_EQ(wat_array::NOTFOUND, wa.Lookup(0));
+  ASSERT_EQ(wat_array::NOTFOUND, wa.Freq(0));
+  ASSERT_EQ(wat_array::NOTFOUND, wa.FreqSum(0, 1));
   
   uint64_t rank = 0;
   uint64_t rank_less_than = 0;
   uint64_t rank_more_than = 0;
-  ws.RankAll(0, 0, rank, rank_less_than, rank_more_than);
+  wa.RankAll(0, 0, rank, rank_less_than, rank_more_than);
   ASSERT_EQ(0, rank);
   ASSERT_EQ(0, rank_more_than);
   ASSERT_EQ(0, rank_less_than);
 
   uint64_t pos = 0;
   uint64_t val = 0;
-  ws.MaxRange(0, 0, pos, val);
+  wa.MaxRange(0, 0, pos, val);
   ASSERT_EQ(wat_array::NOTFOUND, pos);
-  ws.MinRange(0, 0, pos, val);
+  wa.MinRange(0, 0, pos, val);
   ASSERT_EQ(wat_array::NOTFOUND, pos);
 
   ostringstream oss;
-  ws.Save(oss);
+  wa.Save(oss);
   ASSERT_EQ(false, !oss);
   
   istringstream iss(oss.str());
@@ -90,12 +90,37 @@ TEST(wat_array, alphanum_one){
   wa.Init(A);
   ASSERT_EQ(5, wa.length());
   ASSERT_EQ(1, wa.alphabet_num());
-  ASSERT_EQ(0, wa.Rank(0, 0));
-  ASSERT_EQ(1, wa.Rank(0, 1));
-  ASSERT_EQ(2, wa.Rank(0, 2));
-  ASSERT_EQ(3, wa.Rank(0, 3));
-  ASSERT_EQ(4, wa.Rank(0, 4));
-  ASSERT_EQ(5, wa.Rank(0, 5));
+  for (uint64_t i = 0; i < wa.length(); ++i){
+    ASSERT_EQ(i, wa.Rank(0, i));
+    ASSERT_EQ(0, wa.RankLessThan(0, i));
+    ASSERT_EQ(0, wa.RankMoreThan(0, i));
+    ASSERT_EQ(i, wa.Select(0, i+1));
+    for (uint64_t j = i+1; j <= wa.length(); ++j){
+      uint64_t pos = 0;
+      uint64_t val = 0;
+      wa.MaxRange(i, j, pos, val);
+      ASSERT_EQ(i, pos);
+      ASSERT_EQ(0, val);
+
+      pos = 0;
+      val = 0;
+      wa.MinRange(i, j, pos, val);
+      ASSERT_EQ(i, pos);
+      ASSERT_EQ(0, val);
+
+      vector<wat_array::ListResult> lrs;
+      wa.ListMinRange(0, 1, i, j, j-i, lrs);
+      ASSERT_EQ(1, lrs.size());
+      ASSERT_EQ(0, lrs[0].c);
+      ASSERT_EQ(j-i, lrs[0].freq);
+
+      wa.ListModeRange(0, 1, i, j, j-i, lrs);
+      sort(lrs.begin(), lrs.end());
+      ASSERT_EQ(1, lrs.size());
+      ASSERT_EQ(0, lrs[0].c);
+      ASSERT_EQ(j-i, lrs[0].freq);
+    }
+  }
 }
 
 TEST(wat_array, save){
@@ -126,7 +151,7 @@ TEST(wat_array, save){
 }
   
 TEST(wat_array, small){
-  wat_array::WatArray ws;
+
   vector<uint64_t> array;
   const uint64_t alphabet_num = 200;
   for (uint64_t i = 0; i < alphabet_num; ++i){
@@ -134,50 +159,51 @@ TEST(wat_array, small){
   }
   const uint64_t length = array.size();
 
-  ws.Init(array);
-  ASSERT_EQ(alphabet_num, ws.alphabet_num());
-  ASSERT_EQ(length, ws.length());
+  wat_array::WatArray wa;
+  wa.Init(array);
+  ASSERT_EQ(alphabet_num, wa.alphabet_num());
+  ASSERT_EQ(length, wa.length());
 
   for (uint64_t i = 0; i < alphabet_num; ++i){
-    ASSERT_EQ(1, ws.Freq(i));
+    ASSERT_EQ(1, wa.Freq(i));
   }
 
   vector<uint64_t> counts(alphabet_num);
   for (uint64_t i = 0; i < length; ++i){
     uint64_t c = array[i];
-    ASSERT_EQ(c, ws.Lookup(i));
+    ASSERT_EQ(c, wa.Lookup(i));
     uint64_t sum = 0;
     for (uint64_t j = 0; j < alphabet_num; ++j){
-      ASSERT_EQ(counts[j],                      ws.Rank(j, i));
-      ASSERT_EQ(sum,                            ws.RankLessThan(j, i));
-      ASSERT_EQ(i - sum - counts[j],            ws.RankMoreThan(j, i));
+      ASSERT_EQ(counts[j],                      wa.Rank(j, i));
+      ASSERT_EQ(sum,                            wa.RankLessThan(j, i));
+      ASSERT_EQ(i - sum - counts[j],            wa.RankMoreThan(j, i));
       sum += counts[j];
     }
     counts[c]++;
-    ASSERT_EQ(i, ws.Select(c, counts[c]));
+    ASSERT_EQ(i, wa.Select(c, counts[c]));
 
-    for (uint64_t j = i+1; j <= ws.length(); ++j){
+    for (uint64_t j = i+1; j <= wa.length(); ++j){
       uint64_t pos = 0;
       uint64_t val = 0;
-      ws.MaxRange(i, j, pos, val);
+      wa.MaxRange(i, j, pos, val);
       ASSERT_EQ(j - 1, pos);
       ASSERT_EQ(j - 1, val);
 
       pos = 0;
       val = 0;
-      ws.MinRange(i, j, pos, val);
+      wa.MinRange(i, j, pos, val);
       ASSERT_EQ(i, pos);
       ASSERT_EQ(i, val);
 
       vector<wat_array::ListResult> lrs;
-      ws.ListMinRange(0, alphabet_num, i, j, j-i, lrs);
+      wa.ListMinRange(0, alphabet_num, i, j, j-i, lrs);
       
       for (size_t k = 0; k < lrs.size(); ++k){
 	ASSERT_EQ(i+k, lrs[k].c);
 	ASSERT_EQ(1,   lrs[k].freq);
       }
 
-      ws.ListModeRange(0, alphabet_num, i, j, j-i, lrs);
+      wa.ListModeRange(0, alphabet_num, i, j, j-i, lrs);
       sort(lrs.begin(), lrs.end());
       for (size_t k = 0; k < lrs.size(); ++k){
 	ASSERT_EQ(i+k, lrs[k].c);
@@ -188,7 +214,6 @@ TEST(wat_array, small){
 }
 
 TEST(wat_array, random){
-  wat_array::WatArray ws;
   vector<uint64_t> array;
 
   uint64_t alphabet_num = 100;
@@ -199,30 +224,32 @@ TEST(wat_array, random){
     array.push_back(c);
     freq[c]++;
   }
-  ws.Init(array);
 
-  ASSERT_EQ(alphabet_num, ws.alphabet_num());
-  ASSERT_EQ(n, ws.length());
+  wat_array::WatArray wa;
+  wa.Init(array);
+
+  ASSERT_EQ(alphabet_num, wa.alphabet_num());
+  ASSERT_EQ(n, wa.length());
   for (uint64_t i = 0; i < alphabet_num; ++i){
-    ASSERT_EQ(freq[i], ws.Freq(i));
+    ASSERT_EQ(freq[i], wa.Freq(i));
   }
 
   vector<uint64_t> counts(alphabet_num);
   for (uint64_t i = 0; i < array.size(); ++i){
     uint64_t c = array[i];
 
-    ASSERT_EQ(c, ws.Lookup(i));
+    ASSERT_EQ(c, wa.Lookup(i));
     uint64_t sum = 0;
     for (uint64_t j = 0; j < alphabet_num; ++j){
       if ((rand() % 100) == 0){
-	ASSERT_EQ(counts[j],           ws.Rank(j, i));
-	ASSERT_EQ(sum,                 ws.RankLessThan(j, i));
-	ASSERT_EQ(i - sum - counts[j], ws.RankMoreThan(j, i));
+	ASSERT_EQ(counts[j],           wa.Rank(j, i));
+	ASSERT_EQ(sum,                 wa.RankLessThan(j, i));
+	ASSERT_EQ(i - sum - counts[j], wa.RankMoreThan(j, i));
       }
       sum += counts[j];
     }
     counts[c]++;
-    ASSERT_EQ(i, ws.Select(c, counts[c]));
+    ASSERT_EQ(i, wa.Select(c, counts[c]));
   }
 }
 
@@ -282,7 +309,7 @@ public:
   }
 };
 
-void WatRandomInitialize(wat_array::WatArray& ws,
+void WatRandomInitialize(wat_array::WatArray& wa,
 			 vector<uint64_t>& array,
 			 uint64_t alphabet_num, 
 			 uint64_t n){
@@ -292,71 +319,71 @@ void WatRandomInitialize(wat_array::WatArray& ws,
     array.push_back(c);
     freq[c]++;
   }
-  ws.Init(array);
+  wa.Init(array);
 }
 
 
 TEST(wat_array, min_range){
-  wat_array::WatArray ws;
+  wat_array::WatArray wa;
   vector<uint64_t> array;
-  WatRandomInitialize(ws, array, 100, 1000);
+  WatRandomInitialize(wa, array, 100, 1000);
 
   for (size_t iter = 0; iter < 10; ++iter){
-    RandomQuery rq(ws.length());
+    RandomQuery rq(wa.length());
     vector<pair<uint64_t, size_t> > vals;
     SetVals(rq, array, vals);
 
     uint64_t min_pos = 0;
     uint64_t min_val = 0;
-    ws.MinRange(rq.beg, rq.end, min_pos, min_val);
+    wa.MinRange(rq.beg, rq.end, min_pos, min_val);
     ASSERT_EQ(vals.front().first , min_val); 
     ASSERT_EQ(vals.front().second, min_pos);
   }
 }
 
 TEST(wat_array, quantile_range){
-  wat_array::WatArray ws;
+  wat_array::WatArray wa;
   vector<uint64_t> array;
-  WatRandomInitialize(ws, array, 100, 1000);
+  WatRandomInitialize(wa, array, 100, 1000);
 
   for (size_t iter = 0; iter < 10; ++iter){
-    RandomQuery rq(ws.length());
+    RandomQuery rq(wa.length());
     vector<pair<uint64_t, size_t> > vals;
     SetVals(rq, array, vals);
 
     uint64_t kth_pos = 0;
     uint64_t kth_val = 0;
     uint64_t k = rand() % (rq.end - rq.beg);
-    ws.QuantileRange(rq.beg, rq.end, k, kth_pos, kth_val);
+    wa.QuantileRange(rq.beg, rq.end, k, kth_pos, kth_val);
     ASSERT_EQ(vals[k].first, kth_val);
   }
 }
 
 TEST(wat_array, max_range){
-  wat_array::WatArray ws;
+  wat_array::WatArray wa;
   vector<uint64_t> array;
-  WatRandomInitialize(ws, array, 10, 1000);
+  WatRandomInitialize(wa, array, 10, 1000);
 
   for (size_t iter = 0; iter < 10; ++iter){
-    RandomQuery rq(ws.length());
+    RandomQuery rq(wa.length());
     vector<pair<uint64_t, size_t> > vals;
     SetVals(rq, array, vals);
 
     uint64_t max_pos = 0;
     uint64_t max_val = 0;
-    ws.MaxRange(rq.beg, rq.end, max_pos, max_val);
+    wa.MaxRange(rq.beg, rq.end, max_pos, max_val);
     ASSERT_EQ(vals.back().first , max_val);
   }
 }
 
 TEST(wat_array, list_mode_range){
-  wat_array::WatArray ws;
+  wat_array::WatArray wa;
   vector<uint64_t> array;
-  WatRandomInitialize(ws, array, 100, 100);
+  WatRandomInitialize(wa, array, 100, 100);
 
   for (size_t iter = 0; iter < 10; ++iter){
-    RandomQuery rq(ws.length());
-    RandomQuery arq(ws.alphabet_num());
+    RandomQuery rq(wa.length());
+    RandomQuery arq(wa.alphabet_num());
     
     vector<pair<uint64_t, size_t> > vals;
     SetVals(rq, array, vals);
@@ -368,7 +395,7 @@ TEST(wat_array, list_mode_range){
 
     vector<wat_array::ListResult> lrs;
     uint64_t num = rq.end - rq.beg;
-    ws.ListModeRange(arq.beg, arq.end, rq.beg, rq.end, num, lrs);
+    wa.ListModeRange(arq.beg, arq.end, rq.beg, rq.end, num, lrs);
     sort(lrs.begin(), lrs.end(), FreqCompLR());
 
     for (size_t i = 0; i < lrs.size() && i < uniq_counts.size(); ++i){
@@ -379,13 +406,13 @@ TEST(wat_array, list_mode_range){
 }
 
 TEST(wat_array, list_min_range){
-  wat_array::WatArray ws;
+  wat_array::WatArray wa;
   vector<uint64_t> array;
-  WatRandomInitialize(ws, array, 100, 1000);
+  WatRandomInitialize(wa, array, 100, 1000);
 
   for (size_t iter = 0; iter < 10; ++iter){ 
-    RandomQuery rq(ws.length());
-    RandomQuery arq(ws.alphabet_num());
+    RandomQuery rq(wa.length());
+    RandomQuery arq(wa.alphabet_num());
     vector<pair<uint64_t, size_t> > vals;
     SetVals(rq, array, vals);
     vector<pair<uint64_t, uint64_t> > uniq_counts;
@@ -394,7 +421,7 @@ TEST(wat_array, list_min_range){
 
     vector<wat_array::ListResult> lrs;
     uint64_t num = rq.end - rq.beg;
-    ws.ListMinRange(arq.beg, arq.end, rq.beg, rq.end, num, lrs);
+    wa.ListMinRange(arq.beg, arq.end, rq.beg, rq.end, num, lrs);
     for (size_t i = 0; i < lrs.size() && i < uniq_counts.size(); ++i){
       ASSERT_EQ(uniq_counts[i].first, lrs[i].c);
       ASSERT_EQ(uniq_counts[i].second, lrs[i].freq);
@@ -403,13 +430,13 @@ TEST(wat_array, list_min_range){
 }
 
 TEST(wat_array, list_max_range){
-  wat_array::WatArray ws;
+  wat_array::WatArray wa;
   vector<uint64_t> array;
-  WatRandomInitialize(ws, array, 100, 1000);
+  WatRandomInitialize(wa, array, 100, 1000);
 
   for (size_t iter = 0; iter < 10; ++iter){ 
-    RandomQuery rq(ws.length());
-    RandomQuery arq(ws.alphabet_num());
+    RandomQuery rq(wa.length());
+    RandomQuery arq(wa.alphabet_num());
     vector<pair<uint64_t, size_t> > vals;
     SetVals(rq, array, vals);
     reverse(vals.begin(), vals.end());
@@ -419,7 +446,7 @@ TEST(wat_array, list_max_range){
 
     vector<wat_array::ListResult> lrs;
     uint64_t num = rq.end - rq.beg;
-    ws.ListMaxRange(arq.beg, arq.end, rq.beg, rq.end, num, lrs);
+    wa.ListMaxRange(arq.beg, arq.end, rq.beg, rq.end, num, lrs);
     for (size_t i = 0; i < lrs.size() && i < uniq_counts.size(); ++i){
       ASSERT_EQ(uniq_counts[i].first, lrs[i].c);
       ASSERT_EQ(uniq_counts[i].second, lrs[i].freq);
