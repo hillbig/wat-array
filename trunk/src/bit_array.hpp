@@ -48,6 +48,7 @@ public:
   void Init(uint64_t size);
   void Clear();
   void SetBit(uint64_t bit, uint64_t pos);
+
   void Build();
   uint64_t Rank(uint64_t bit, uint64_t pos) const;
   uint64_t Select(uint64_t bit, uint64_t rank) const;
