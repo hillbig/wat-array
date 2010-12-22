@@ -335,7 +335,6 @@ uint64_t WatArray::GetAlphabetNum(const std::vector<uint64_t>& array) const {
 
 uint64_t WatArray::Log2(uint64_t x) const{
   if (x == 0) return 0;
-  if (x == 1) return 1;
   x--;
   uint64_t bit_num = 0;
   while (x >> bit_num){
