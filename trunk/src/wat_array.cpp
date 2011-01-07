@@ -97,10 +97,11 @@ uint64_t WatArray::RankMoreThan(uint64_t c, uint64_t pos) const{
 
 void WatArray::RankAll(uint64_t c, uint64_t pos,
 		       uint64_t& rank,  uint64_t& rank_less_than, uint64_t& rank_more_than) const{
-  if (c >= alphabet_num_) {
+  if (c > alphabet_num_) {
     rank_less_than = NOTFOUND;
     rank_more_than = NOTFOUND;
     rank           = NOTFOUND;
+    return;
   }
   if (pos >= length_) {
     pos = length_;
@@ -155,10 +156,10 @@ uint64_t WatArray::FreqRange(uint64_t min_c, uint64_t max_c, uint64_t begin_pos,
   if (max_c <= min_c) return 0;
   if (end_pos > length_ || begin_pos > end_pos) return 0;
   return 
-    + RankLessThan(end_pos,   max_c)
-    - RankLessThan(end_pos,   min_c)
-    - RankLessThan(begin_pos, max_c)
-    + RankLessThan(begin_pos, min_c);
+    + RankLessThan(max_c, end_pos)
+    - RankLessThan(min_c, end_pos)
+    - RankLessThan(max_c, begin_pos)
+    + RankLessThan(min_c, begin_pos);
 }
 
 void WatArray::MaxRange(uint64_t begin_pos, uint64_t end_pos, uint64_t& pos, uint64_t& val) const {

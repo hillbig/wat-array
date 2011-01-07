@@ -20,8 +20,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "../src/wat_array.hpp"
-#include "cmdline.h"
+#include <wat_array/wat_array.hpp>
+#include "../cmdline.h"
 
 using namespace std;
 

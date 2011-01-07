@@ -1,0 +1,6 @@
+def build(bld):
+  bld(features     = 'cxx cprogram',
+      source       = 'perm_index_main.cpp perm_index.cpp',
+      target       = 'wat_perm_index',
+      includes     = '.',
+      uselib_local = 'wat_array')
