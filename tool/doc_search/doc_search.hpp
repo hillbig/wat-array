@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 #include <stdint.h>
-#include "../src/wat_array.hpp"
+#include <wat_array/wat_array.hpp>
 
 namespace wat_array {
 

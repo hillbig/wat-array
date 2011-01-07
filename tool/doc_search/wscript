@@ -1,0 +1,6 @@
+def build(bld):
+  bld(features     ='cxx cprogram',
+      source       = 'doc_search_main.cpp doc_search.cpp',
+      target       = 'wat_doc_search',
+      includes     = '.',
+      uselib_local = 'wat_array')

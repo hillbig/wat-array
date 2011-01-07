@@ -1,0 +1,6 @@
+def build(bld):
+  bld(features     ='cxx cprogram',
+      source       = 'wat_array_main.cpp',
+      target       = 'wat_array_builder',
+      includes     = '.',
+      uselib_local = 'wat_array')

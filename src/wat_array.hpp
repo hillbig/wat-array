@@ -30,7 +30,7 @@
 namespace wat_array {
 
 /**
- Wavelet Tree Array Libarary for array processing.
+ Wavelet Tree Array Library for array processing.
  
  Input: A[0...n], 0 <= A[i] < k,
  Space: n log_2 k bits 

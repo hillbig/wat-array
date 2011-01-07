@@ -1,4 +1,4 @@
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 APPNAME = 'wat_array'
 
 srcdir = '.'
@@ -21,5 +21,5 @@ def dist_hook():
     os.remove('googlecode_upload.py')
 
 def build(bld):
-  bld.recurse('src test')
+  bld.recurse('src test performance_test')
   bld.install_files('/usr/lib/pkgconfig', 'wat_array.pc')

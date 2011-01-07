@@ -175,6 +175,10 @@ TEST(wat_array, small){
     }
   }
 
+  ASSERT_EQ(1, wa.Rank(wa.alphabet_num()-1, wa.length()));
+  ASSERT_EQ(0, wa.Rank(wa.alphabet_num()  , wa.length()));
+  ASSERT_EQ(wat_array::NOTFOUND, wa.Rank(wa.alphabet_num()+1, wa.length()));
+
   vector<uint64_t> counts(alphabet_num);
   for (uint64_t i = 0; i < length; ++i){
     uint64_t c = array[i];
@@ -382,6 +386,26 @@ TEST(wat_array, max_range){
     ASSERT_EQ(vals.back().first , max_val);
   }
 }
+
+TEST(wat_array, freq_range){
+  wat_array::WatArray wa;
+  vector<uint64_t> array;
+  WatRandomInitialize(wa, array, 10, 1000);
+
+  for (size_t iter = 0; iter < 10; ++iter){
+    RandomQuery rq(wa.length());
+    RandomQuery arq(wa.alphabet_num());
+    uint64_t count = 0;
+    for (uint64_t i = rq.beg; i < rq.end; ++i){
+      if (arq.beg <= array[i] &&
+	  array[i] < arq.end){
+	++count;
+      }
+    }
+    ASSERT_EQ(count, wa.FreqRange(arq.beg, arq.end, rq.beg, rq.end));
+  }
+}
+
 
 TEST(wat_array, list_mode_range){
   wat_array::WatArray wa;

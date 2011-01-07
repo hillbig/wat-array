@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include "doc_search.hpp"
-#include "sais.hxx"
+#include "../third_party/sais.hxx"
 
 using namespace std;
 

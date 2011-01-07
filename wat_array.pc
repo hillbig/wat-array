@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: wat_array
+Description: Wavelet Tree Library for Myriad Array Operations
+Version: 0.0.3x
+Cflags: -I${includedir}
+Libs: -L${libdir} -lwat_array
