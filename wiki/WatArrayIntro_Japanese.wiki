@@ -41,15 +41,18 @@ wa.Init(array);
 
 }}}
 
-wat-array/tool/には、様々なサンプルプログラムがありますのでそちらを参照してください。
+wat-array/performance_test/performance_test.cppに、実際に利用したサンプルプログラムがあります。
+wat-array/test/wat_array_test.cppには想定される動作を記述したサンプルプログラムがあります。
+
+なお、wat-array/tool/以下は現在メンテナンス中で利用することはできません。
 
 = API = 
 wat-arrayがサポートしている操作について以下にまとめます。APIの正確な詳細については [http://code.google.com/p/wat-array/source/browse/trunk/src/wat_array.hpp wat_array.hpp]を参照してください。
 
 || *Method* || ** ||
 || `Init(A)` || 入力配列 `A`に対するwat-arrayを構築する ||
-|| `length` || `A`の長さを返す ||
-|| `alphabet_num` || `A`中のアルファベット数 (A中の最大値+1) を返す ||
+|| `length()` || `A`の長さを返す ||
+|| `alphabet_num()` || `A`中のアルファベット数 (A中の最大値+1) を返す ||
 || `Freq(c)` || `A`中の文字`c`の出現回数を返す||
 || `Lookup(pos) `||  `A[pos]`を返す ||
 || `Rank(c, pos)` ||  `A[0...pos)`中の文字`c`の数を返す ||
@@ -67,6 +70,7 @@ wat-arrayがサポートしている操作について以下にまとめます�
 || `Load(is)` || 状態（索引）をisから読み込む||
 
 MaxRange, MinRange, QuantileRangeについては、もし該当するような位置が複数存在する場合、最左の位置を返す。
+また、引数が有効で無い場合はwat_array::NOTFOUNDを返す。
 
 = 例=
 
@@ -188,5 +192,6 @@ Proc. ESA'10
   List系の操作、特にListModeRange
   * R.Grossi, A. Gupta, and J. Vitter "High-order entropy-compressed text indexes", Proc. SODA 03
   Wavelet Treeの元論文
-  * tabeiさんにはLog2()の問題を指摘していただきました。ありがとうございます。
+  * tabeiさんにLog2()の問題を指摘していただきました。ありがとうございます。
+  * tsubosakaさんにFreqRange, Rankの問題を指摘していただきました。ありがとうございます。
  
