@@ -66,6 +66,11 @@ You can find the formal definition in [http://code.google.com/p/wat-array/source
 || `Load(is)` || Load the status from is ||
 
 For MaxRange, MinRange, and QuantileRange, if there are many such positions, return the left most position.
+If an argument is invalid, these functions return wat_array::NOTFOUND. 
+
+You can find sample programs at 
+performance_test/performance_test.cpp
+test/wat_array_test.cpp
 
 = Example =
 
@@ -147,5 +152,5 @@ wat-array uses the following works
   * Travis Gagie, Gonzalo Navarro, and Simon Puglisi, "Colored Range Queries and Document Retrieval", Proc. SPIRE'10
   * Shane Culpepper, Gonzalo Navarro, Simon Puglisi, and Andrew Turpin. "Top-k Ranked Document Search in General Text Databases", Proc. ESA'10 
   * R.Grossi, A. Gupta, and J. Vitter "High-order entropy-compressed text indexes", Proc. SODA 03
-
-Thanks Mr. Tabei for finding the bug about Log2().
+ * Thanks Mr. Tabei for reporting the bug about Log2().
+ * Thanks Mr. Tsubosaka for reporting the bug about FreqRange and Rank()
