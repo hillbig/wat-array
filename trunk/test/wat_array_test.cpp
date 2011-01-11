@@ -41,7 +41,7 @@ TEST(wat_array, trivial){
   wat_array::WatArray wa;
   ASSERT_EQ(0, wa.alphabet_num());
   ASSERT_EQ(0, wa.length());
-  ASSERT_EQ(0, wa.Rank(0, 0));
+  ASSERT_EQ(wat_array::NOTFOUND, wa.Rank(0, 0));
   ASSERT_EQ(wat_array::NOTFOUND, wa.Select(0, 0));
   ASSERT_EQ(wat_array::NOTFOUND, wa.Lookup(0));
   ASSERT_EQ(wat_array::NOTFOUND, wa.Freq(0));
@@ -51,9 +51,9 @@ TEST(wat_array, trivial){
   uint64_t rank_less_than = 0;
   uint64_t rank_more_than = 0;
   wa.RankAll(0, 0, rank, rank_less_than, rank_more_than);
-  ASSERT_EQ(0, rank);
-  ASSERT_EQ(0, rank_more_than);
-  ASSERT_EQ(0, rank_less_than);
+  ASSERT_EQ(wat_array::NOTFOUND, rank);
+  ASSERT_EQ(wat_array::NOTFOUND, rank_more_than);
+  ASSERT_EQ(wat_array::NOTFOUND, rank_less_than);
 
   uint64_t pos = 0;
   uint64_t val = 0;
@@ -73,7 +73,7 @@ TEST(wat_array, trivial){
   
   ASSERT_EQ(0, ws_load.alphabet_num());
   ASSERT_EQ(0, ws_load.length());
-  ASSERT_EQ(0, ws_load.Rank(0, 0));
+  ASSERT_EQ(wat_array::NOTFOUND, ws_load.Rank(0, 0));
   ASSERT_EQ(wat_array::NOTFOUND, ws_load.Select(0, 0));
   ASSERT_EQ(wat_array::NOTFOUND, ws_load.Lookup(0));
 }
@@ -176,7 +176,7 @@ TEST(wat_array, small){
   }
 
   ASSERT_EQ(1, wa.Rank(wa.alphabet_num()-1, wa.length()));
-  ASSERT_EQ(0, wa.Rank(wa.alphabet_num()  , wa.length()));
+  ASSERT_EQ(wat_array::NOTFOUND, wa.Rank(wa.alphabet_num()  , wa.length()));
   ASSERT_EQ(wat_array::NOTFOUND, wa.Rank(wa.alphabet_num()+1, wa.length()));
 
   vector<uint64_t> counts(alphabet_num);

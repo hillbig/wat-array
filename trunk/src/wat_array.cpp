@@ -43,6 +43,7 @@ void WatArray::Init(const vector<uint64_t>& array){
   Clear();
   alphabet_num_     = GetAlphabetNum(array);
   alphabet_bit_num_ = Log2(alphabet_num_);
+
   length_           = static_cast<uint64_t>(array.size());
   SetArray(array);
   SetOccs(array);
@@ -97,7 +98,7 @@ uint64_t WatArray::RankMoreThan(uint64_t c, uint64_t pos) const{
 
 void WatArray::RankAll(uint64_t c, uint64_t pos,
 		       uint64_t& rank,  uint64_t& rank_less_than, uint64_t& rank_more_than) const{
-  if (c > alphabet_num_) {
+  if (c >= alphabet_num_) {
     rank_less_than = NOTFOUND;
     rank_more_than = NOTFOUND;
     rank           = NOTFOUND;
