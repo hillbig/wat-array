@@ -70,7 +70,8 @@ wat-arrayがサポートしている操作について以下にまとめます�
 || `Load(is)` || 状態（索引）をisから読み込む||
 
 MaxRange, MinRange, QuantileRangeについては、もし該当するような位置が複数存在する場合、最左の位置を返す。
-また、引数が有効で無い場合はwat_array::NOTFOUNDを返す。
+引数が有効で無い場合はwat_array::NOTFOUNDを返す。
+Rankの場合はc>=alphabet_numの時、Selectの時はc>=alphabet_numまたは、rank>Freq(c)の時、
 
 = 例=
 
